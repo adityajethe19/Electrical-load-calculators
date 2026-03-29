@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Electrical Load Calculator</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f4f4;
+            text-align: center;
+        }
+        .container {
+            width: 400px;
+            margin: 30px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px gray;
+        }
+        input {
+            width: 80%;
+            padding: 8px;
+            margin: 5px;
+        }
+        button {
+            padding: 10px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Electrical Load Calculator</h2>
+
+    <input type="number" id="power" placeholder="Appliance Power (Watts)">
+    <input type="number" id="quantity" placeholder="Quantity">
+
+    <br>
+    <button onclick="addLoad()">Add Appliance</button>
+    <button onclick="calculateTotal()">Calculate Total</button>
+
+    <div class="result" id="result"></div>
+</div>
+
+<script>
+    let totalLoad = 0;
+
+    function addLoad() {
+        let power = document.getElementById("power").value;
+        let quantity = document.getElementById("quantity").value;
+
+        power = parseFloat(power);
+        quantity = parseInt(quantity);
+
+        if (isNaN(power) || isNaN(quantity) || power <= 0 || quantity <= 0) {
+            alert("Please enter valid values");
+            return;
+        }
+
+        totalLoad += power * quantity;
+
+        alert("Appliance added!");
+        document.getElementById("power").value = "";
+        document.getElementById("quantity").value = "";
+    }
+
+    function calculateTotal() {
+        let voltage = 230; // Standard voltage
+        let current = totalLoad / voltage;
+        let kw = totalLoad / 1000;
+
+        document.getElementById("result").innerHTML =
+            "Total Load: " + totalLoad.toFixed(2) + " Watts<br>" +
+            "Total Load: " + kw.toFixed(2) + " kW<br>" +
+            "Estimated Current: " + current.toFixed(2) + " Amps";
+    }
+</script>
+
+</body>
+</html>
