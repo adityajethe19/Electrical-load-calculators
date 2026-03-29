@@ -1,84 +1,205 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Electrical Load Calculator</title>
-    <style>
-        body {
-            font-family: Arial;
-            background: #f4f4f4;
-            text-align: center;
-        }
-        .container {
-            width: 400px;
-            margin: 30px auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px gray;
-        }
-        input {
-            width: 80%;
-            padding: 8px;
-            margin: 5px;
-        }
-        button {
-            padding: 10px;
-            margin-top: 10px;
-            cursor: pointer;
-        }
-        .result {
-            margin-top: 20px;
-            font-weight: bold;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>Electrical Load Calculator</title>
+
+<style>
+    body {
+        font-family: Arial;
+        background: linear-gradient(135deg, #0f2027, #2c5364);
+        text-align: center;
+    }
+
+    .container {
+        width: 450px;
+        margin: 40px auto;
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    }
+
+    h2 {
+        color: #2c5364;
+    }
+
+    select, input {
+        width: 85%;
+        padding: 10px;
+        margin: 6px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+    }
+
+    button {
+        padding: 10px 15px;
+        margin: 6px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        color: white;
+        font-weight: bold;
+    }
+
+    .add-btn { background: #28a745; }
+    .calc-btn { background: #007bff; }
+    .clear-btn { background: #dc3545; }
+
+    .add-btn:hover { background: #218838; }
+    .calc-btn:hover { background: #0056b3; }
+    .clear-btn:hover { background: #c82333; }
+
+    table {
+        width: 100%;
+        margin-top: 15px;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+
+    th {
+        background: #2c5364;
+        color: white;
+    }
+
+    .result {
+        margin-top: 15px;
+        padding: 12px;
+        background: #eef3f7;
+        border-radius: 6px;
+        font-weight: bold;
+    }
+</style>
 </head>
+
 <body>
 
 <div class="container">
-    <h2>Electrical Load Calculator</h2>
+    <h2>⚡ Electrical Load Calculator</h2>
 
-    <input type="number" id="power" placeholder="Appliance Power (Watts)">
+    <!-- Appliance Dropdown -->
+    <select id="appliance" onchange="setPower()">
+        <option value="">Select Appliance</option>
+        <option value="75">Fan (75W)</option>
+        <option value="100">LED TV (100W)</option>
+        <option value="150">Refrigerator (150W)</option>
+        <option value="1000">Microwave (1000W)</option>
+        <option value="1500">Heater (1500W)</option>
+        <option value="2000">Air Conditioner (2000W)</option>
+        <option value="60">Light Bulb (60W)</option>
+    </select>
+
+    <input type="number" id="power" placeholder="Power (Watts)">
     <input type="number" id="quantity" placeholder="Quantity">
 
     <br>
-    <button onclick="addLoad()">Add Appliance</button>
-    <button onclick="calculateTotal()">Calculate Total</button>
+
+    <button class="add-btn" onclick="addAppliance()">Add Appliance</button>
+    <button class="calc-btn" onclick="calculateLoad()">Calculate Total</button>
+    <button class="clear-btn" onclick="clearAll()">Clear All</button>
+
+    <table id="table">
+        <thead>
+            <tr>
+                <th>Appliance</th>
+                <th>Power (W)</th>
+                <th>Qty</th>
+                <th>Total (W)</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
 
     <div class="result" id="result"></div>
 </div>
 
 <script>
+    let appliances = [];
     let totalLoad = 0;
 
-    function addLoad() {
-        let power = document.getElementById("power").value;
-        let quantity = document.getElementById("quantity").value;
+    // Auto-fill power
+    function setPower() {
+        let applianceSelect = document.getElementById("appliance");
+        let powerInput = document.getElementById("power");
 
-        power = parseFloat(power);
-        quantity = parseInt(quantity);
+        powerInput.value = applianceSelect.value;
+    }
 
-        if (isNaN(power) || isNaN(quantity) || power <= 0 || quantity <= 0) {
-            alert("Please enter valid values");
+    // Add appliance
+    function addAppliance() {
+        let name = document.getElementById("appliance").options[document.getElementById("appliance").selectedIndex].text;
+        let power = parseFloat(document.getElementById("power").value);
+        let quantity = parseInt(document.getElementById("quantity").value);
+
+        if (!power || !quantity || power <= 0 || quantity <= 0) {
+            alert("Enter valid values");
             return;
         }
 
-        totalLoad += power * quantity;
+        let total = power * quantity;
 
-        alert("Appliance added!");
+        appliances.push({ name, power, quantity, total });
+        totalLoad += total;
+
+        updateTable();
+
         document.getElementById("power").value = "";
         document.getElementById("quantity").value = "";
+        document.getElementById("appliance").value = "";
     }
 
-    function calculateTotal() {
-        let voltage = 230; // Standard voltage
+    // Update table
+    function updateTable() {
+        let tbody = document.querySelector("#table tbody");
+        tbody.innerHTML = "";
+
+        appliances.forEach((item, index) => {
+            let row = `
+                <tr>
+                    <td>${item.name}</td>
+                    <td>${item.power}</td>
+                    <td>${item.quantity}</td>
+                    <td>${item.total}</td>
+                    <td>
+                        <button onclick="deleteItem(${index})" style="background:red;color:white;border:none;padding:5px;">X</button>
+                    </td>
+                </tr>
+            `;
+            tbody.innerHTML += row;
+        });
+    }
+
+    // Delete item
+    function deleteItem(index) {
+        totalLoad -= appliances[index].total;
+        appliances.splice(index, 1);
+        updateTable();
+    }
+
+    // Calculate
+    function calculateLoad() {
+        let voltage = 230;
         let current = totalLoad / voltage;
         let kw = totalLoad / 1000;
 
-        document.getElementById("result").innerHTML =
-            "Total Load: " + totalLoad.toFixed(2) + " Watts<br>" +
-            "Total Load: " + kw.toFixed(2) + " kW<br>" +
-            "Estimated Current: " + current.toFixed(2) + " Amps";
+        document.getElementById("result").innerHTML = `
+            ⚡ Total Load: ${totalLoad.toFixed(2)} Watts <br>
+            ⚡ Total Load: ${kw.toFixed(2)} kW <br>
+            ⚡ Estimated Current: ${current.toFixed(2)} Amps
+        `;
+    }
+
+    // Clear all
+    function clearAll() {
+        appliances = [];
+        totalLoad = 0;
+        updateTable();
+        document.getElementById("result").innerHTML = "";
     }
 </script>
 
