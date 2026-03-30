@@ -122,7 +122,6 @@
     let appliances = [];
     let totalLoad = 0;
 
-    // Auto-fill power
     function setPower() {
         let applianceSelect = document.getElementById("appliance");
         let powerInput = document.getElementById("power");
@@ -130,7 +129,7 @@
         powerInput.value = applianceSelect.value;
     }
 
-    // Add appliance
+
     function addAppliance() {
         let name = document.getElementById("appliance").options[document.getElementById("appliance").selectedIndex].text;
         let power = parseFloat(document.getElementById("power").value);
@@ -153,7 +152,7 @@
         document.getElementById("appliance").value = "";
     }
 
-    // Update table
+    
     function updateTable() {
         let tbody = document.querySelector("#table tbody");
         tbody.innerHTML = "";
@@ -174,14 +173,14 @@
         });
     }
 
-    // Delete item
+
     function deleteItem(index) {
         totalLoad -= appliances[index].total;
         appliances.splice(index, 1);
         updateTable();
     }
 
-    // Calculate
+    
     function calculateLoad() {
         let voltage = 230;
         let current = totalLoad / voltage;
@@ -194,7 +193,7 @@
         `;
     }
 
-    // Clear all
+    
     function clearAll() {
         appliances = [];
         totalLoad = 0;
